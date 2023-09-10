@@ -6,6 +6,10 @@ import requests
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
 
+from color_game_logger.logger import setup_colored_logger
+
+logger = setup_colored_logger()
+# Natural Language Toolkit (NLTK)
 nltk.download('stopwords')
 
 
@@ -27,7 +31,9 @@ class TextProcessor:
 
     def tokenize_and_clean(self, text):
         words = text.split()
+        logger.info(len(words))
         filtered_words = [word.lower() for word in words if word.isalpha() and word.lower() not in self.nltk_stopwords]
+        logger.info(len(filtered_words))
         return filtered_words
 
 
@@ -36,6 +42,7 @@ class ETLPipeline:
         self.url = url
         # self.nltk_stopwords = set(stopwords.words("english"))
         self.nltk_stopwords = set(stopwords.words("russian"))
+        logger.info(self.nltk_stopwords)
 
     def run(self):
         scraper = WebScraper(self.url)
@@ -55,4 +62,4 @@ if __name__ == "__main__":
     article_url = 'https://dokumen.pub/python-python-9785907114418.html'
     pipeline = ETLPipeline(article_url)
     result_df = pipeline.run()
-    print(result_df)
+    logger.info(result_df)
