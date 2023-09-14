@@ -2,11 +2,11 @@
 --Dataset: Customers(customer_id, customer_name)
 --         Orders(order_id, customer_id, order_date, order_amount)
 
-select c.customer_id, SUM(o.order_amount) as total_amount
-    from Customers c
-    inner join Orders o
+SELECT c.customer_id, SUM(o.order_amount) as total_amount
+    FROM Customers c
+    JOIN Orders o
         on c.customer_id = o.customer_id
-    group by c.customer_id
+    GROUP BY c.customer_id
     order by SUM(o.order_amount) desc limit 5;
 
 
@@ -14,9 +14,9 @@ select c.customer_id, SUM(o.order_amount) as total_amount
 --Dataset: Customers(customer_id, customer_name)
 --         Orders(order_id, customer_id, order_date, order_amount)
 
-select c.customer_name
-    from Customers c
-    inner join Orders o
+SELECT c.customer_name
+    FROM Customers c
+    JOIN Orders o
         on c.customer_id = o.customer_id
     where o.order_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);
 
@@ -26,24 +26,24 @@ select c.customer_name
 --         Order_items(order_id, product_id, quantity)
 
 
-select p.product_id, p.product_name
-    from Products p
-    inner join Orders o
+SELECT p.product_id, p.product_name
+    FROM Products p
+    JOIN Orders o
         on p.product_id = o.product_id
-    group by p.product_id
-    having count(o.order_id) >= 3;
+    GROUP BY p.product_id
+    HAVING count(o.order_id) >= 3;
 
 
---4. Retrieve the order details for orders placed by customers from a specific city.
+--4. Retrieve the order details for orders placed by customers FROM a specific city.
 --Dataset: Customers(customer_id, customer_name, city)
 --         Orders(order_id, customer_id, order_date)
 --         Order_details(order_id, product_id, quantity)
 
-select od.order_id, od.product_id, od.quantity
-    from Customers c
-    inner join Orders o
+SELECT od.order_id, od.product_id, od.quantity
+    FROM Customers c
+    JOIN Orders o
         on c.customer_id = o.customer_id
-    inner join Order_details od
+    JOIN Order_details od
         on od.order_id = o.order_id
     where c.city = 'specific_city';
 
@@ -54,13 +54,13 @@ select od.order_id, od.product_id, od.quantity
 --         Products(product_id, product_name, price)
 --         Order_details(order_id, product_id, quantity)
 
-select c.customer_id, c.customer_name
-    from Customers c
-    inner join Orders o
+SELECT c.customer_id, c.customer_name
+    FROM Customers c
+    JOIN Orders o
         on c.customer_id = o.customer_id
-    inner join Order_details od
+    JOIN Order_details od
         on od.order_id = o.order_id
-    inner join Products p
+    JOIN Products p
         on p.product_id = od.product_id
     where p.price > 100;
 
@@ -69,24 +69,24 @@ select c.customer_id, c.customer_name
 --Dataset: Customers(customer_id, customer_name)
 --         Orders(order_id, customer_id, order_date, order_amount)
 
-select c.customer_id, avg(o.order_amount) avg_amnt
-    from Customers c
+SELECT c.customer_id, avg(o.order_amount) avg_amnt
+    FROM Customers c
     left join Orders o
         on c.customer_id = o.customer_id
-    group by c.customer_id
+    GROUP BY c.customer_id
 
 
 --7.Find the products that have never been ordered.
 --Dataset: Products(product_id, product_name)
 --         Order_items(order_id, product_id, quantity)
 
-select product_id, product_name
-    from Products
-    where product_id not in (select product_id from Order_items);
+SELECT product_id, product_name
+    FROM Products
+    where product_id not in (SELECT product_id FROM Order_items);
 
 
-select p.product_id, p.product_name
-    from Products p
+SELECT p.product_id, p.product_name
+    FROM Products p
     left join Order_items oi
         on p.product_id = oi.product_id
     where oi.product_id is NULL;
@@ -99,9 +99,9 @@ select p.product_id, p.product_name
 --Note: 0 = Monday, 1 = Tuesday, 2 = Wednesday, 3 = Thursday, 4 = Friday, 5 = Saturday, 6 = Sunday.
 
 
-select distinct c.customer_name
-    from Customers c
-    inner join Orders o
+SELECT distinct c.customer_name
+    FROM Customers c
+    JOIN Orders o
         on c.customer_id = o.customer_id
     where WEEKDAY(o.order_date) in (6,7);
 
@@ -109,20 +109,45 @@ select distinct c.customer_name
 --9.Get the total order amount for each month.
 --Dataset:  Orders(order_id, order_date, order_amount)
 
-select DATE_FORMAT(order_date, '%Y-%m') AS month, SUM(order_amount) AS total_order_amount
-    from Orders
-    group by MONTH(order_date);
+SELECT DATE_FORMAT(order_date, '%Y-%m') AS month, SUM(order_amount) AS total_order_amount
+    FROM Orders
+    GROUP BY MONTH(order_date);
 
 --10.Write a query to find the customers who have placed orders for more than two different products.
 --Dataset: Customers(customer_id, customer_name)
 --         Orders(order_id, customer_id, order_date)
 --         Order_items(order_id, product_id, quantity)
 
-select c.customer_id, c.customer_name
-    from Customers c
-    inner join Orders o
+SELECT c.customer_id, c.customer_name
+    FROM Customers c
+    JOIN Orders o
         on c.customer_id = o.customer_id
-    inner join Order_items od
+    JOIN Order_items od
         on od.order_id = o.order_id
-    group by c.customer_id, c.customer_name
-    having count(distinct oi.product_id) > 2;
+    GROUP BY c.customer_id, c.customer_name
+    HAVING count(distinct oi.product_id) > 2;
+
+
+--1. Retrieve the order details along with the customer name and product name for each order.
+--Dataset: Customers(customer_id, customer_name)
+--         Orders(order_id, customer_id, order_date)
+--         Order_items(order_id, product_id, quantity)
+--         Products(product_id, product_name)
+
+SELECT oi.order_id, oi.quantity, c.customer_name, p.product_name
+    FROM Customers c
+    JOIN Orders o
+        on c.customer_id = o.customer_id
+    JOIN Order_items oi
+        on oi.order_id = o.order_id
+    JOIN Products p
+        on p.product_id = oi.product_id
+        
+--2.Find the products and their corresponding suppliers names.
+--Dataset: Products(product_id, product_name, supplier_id)
+--         Supplier(supplier_id, supplier_name)
+
+SELECT p.product_id, p.product_name, s.supplier_name
+    FROM Products p
+    JOIN Supplier s
+        on p.supplier_id = s.supplier_id
