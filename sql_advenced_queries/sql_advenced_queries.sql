@@ -263,3 +263,13 @@ select customer_id, customer_name
 FROM Customers
 where substring(customer_name, 1, 1) = 'A' and substring(customer_name, -1, 1) = 'n'
 -- customer_name LIKE 'A%n'
+
+--2. Find the products with names containing at least one digit.
+--Dataset: Products(product_id, product_name)
+SELECT *
+    FROM Products
+    WHERE product_name LIKE '%[0-9]%';
+
+SELECT *
+    FROM Products
+    WHERE product_name REGEXP '[0-9]';
