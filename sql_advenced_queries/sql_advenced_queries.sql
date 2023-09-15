@@ -1,3 +1,5 @@
+##################################################ADVANCED_QUERYING#####################################################
+
 --1. Write a query to find the top 5 customers with the highest total order amount
 --Dataset: Customers(customer_id, customer_name)
 --         Orders(order_id, customer_id, order_date, order_amount)
@@ -127,7 +129,7 @@ SELECT c.customer_id, c.customer_name
     GROUP BY c.customer_id, c.customer_name
     HAVING count(distinct oi.product_id) > 2;
 
-
+##################################################JOINS#################################################################
 --1. Retrieve the order details along with the customer name and product name for each order.
 --Dataset: Customers(customer_id, customer_name)
 --         Orders(order_id, customer_id, order_date)
@@ -250,3 +252,14 @@ select p.product_id, p.product_name, sum(oi.quantity) as total_quantity
     LEFT join Order_items oi
         on p.product_id = oi.product_id
     group by product_id, product_name;
+
+
+#######################################ADVANCED_FILTERING_AND_SORTING###################################################
+
+--1. Retrieve all customers with names starting with 'A' and ending with 'n'
+--Dataset: Customers(customer_id, customer_name)
+
+select customer_id, customer_name
+FROM Customers
+where substring(customer_name, 1, 1) = 'A' and substring(customer_name, -1, 1) = 'n'
+-- customer_name LIKE 'A%n'
