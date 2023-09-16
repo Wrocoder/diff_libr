@@ -282,7 +282,7 @@ select employee_id, employee_name, salary
     order by salary asc
 
 
-4.Retrieve the customers whose names contain exactly five characters.
+--4.Retrieve the customers whose names contain exactly five characters.
 --Dataset: Customers(customer_id, customer_name)
 
 select customer_id, customer_name
@@ -295,3 +295,44 @@ select customer_id, customer_name
 select product_id, product_name
     from Products
     where product_name LIKE 'S%e';
+
+--6.Get the list of employees sorted by their last name and then by ther first name;
+--Dataset: Employees(employee_id, first_name, last_name, salary)
+
+select employee_id, employee_name, salary
+    from Employees
+    order by last_name, first_name;
+
+
+--7. Retrieve the orders placed on a specific date and sort them by the customer name in alphabetical order.
+--Dataset: Orders(order_id, customer_name, order_date)
+
+select order_id, customer_name
+    from Orders
+    where order_date = 'specific_date'
+    order by customer_name;
+
+
+--8.Retrieve the products names contain exactly three characters.
+--Dataset: Products(product_id, product_name)
+
+select product_id, product_name
+    from Customers
+    where length(product_name) = 3;
+
+
+--9. Get the list of employees sorted by their salary in descending order. Null values should appear at the beginning.
+--Dataset: Employees(employee_id, employee_name, salary)
+
+select employee_id, employee_name
+    from Employees
+    order by
+        case when salary is NULL then 0 else 1 asc END, salary desc;
+
+
+--10.Retrieve the customers whose name contain a space character.
+--Dataset: Customers(customer_id, customer_name)
+
+SELECT customer_id, customer_name
+    FROM Customers
+    WHERE customer_name LIKE '% %';
