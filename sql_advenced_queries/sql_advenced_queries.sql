@@ -273,3 +273,25 @@ SELECT *
 SELECT *
     FROM Products
     WHERE product_name REGEXP '[0-9]';
+
+--3.Get the list of employees sorted by their salary in ascending order. Null values should appear at the end.
+--Dataset: Employees(employee_id, employee_name, salary)
+
+select employee_id, employee_name, salary
+    from Employees
+    order by salary asc
+
+
+4.Retrieve the customers whose names contain exactly five characters.
+--Dataset: Customers(customer_id, customer_name)
+
+select customer_id, customer_name
+    from Customers
+    where length(customer_name) = 5;
+
+--5.Find the products with names starting with 'S' and ending with 'e';
+--Dataset: Products(product_id, product_name)
+
+select product_id, product_name
+    from Products
+    where product_name LIKE 'S%e';
