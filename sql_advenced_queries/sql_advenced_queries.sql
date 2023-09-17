@@ -336,3 +336,131 @@ select employee_id, employee_name
 SELECT customer_id, customer_name
     FROM Customers
     WHERE customer_name LIKE '% %';
+
+
+--1.Calculate the total quantity and total amount for each order.
+--Dataset: Orders(order_id, order_date)
+--         Order_items(order_id, product_id, quantity, amount)
+
+select order_id, sum(amount) as total_amount, sum(quantity) as total_quantity
+    from Orders o
+    JOIN Order_items oi
+        on o.order_id = oi.order_id
+    group by o.order_id
+
+
+--2.Find the average age and the number of employees for each job title
+--Dataset: Employees(employee_id, employee_name, age, job_title)
+
+select avg(age), count(employee_id)
+    from Employees
+    group by job_title
+
+
+--3.Get the total number of products in each category
+--Dataset: Products(product_id, product_name, category_id)
+--         Categories(category_id, category_name)
+
+SELECT c.category_name,
+       COUNT(p.product_id) AS total_products
+FROM Categories c
+LEFT JOIN Products p ON c.category_id = p.category_id
+GROUP BY c.category_name;
+
+--4. Calculate the average rating and the namber of reviews for each product.
+--Dataset: Products(product_id, product_name, category_id)
+--         Reviews(product_id, rating)
+
+select p.product_name, avg(r.rating), count(r.product_id)
+    FROM Products p
+    left join Reviews r
+    on r.product_id = p.product_id
+    group by p.product_name;
+
+
+--5.Find the customers with the highest and lowest total order amounts
+--Dataset: Customers(customer_id, customer_name)
+--         Orders(order_id, customer_id, order_amount)
+
+
+WITH CTE AS (
+    SELECT c.customer_id, c.customer_name, SUM(o.order_amount) AS amnt
+    FROM Customers c
+    LEFT JOIN Orders o ON c.customer_id = o.customer_id
+    GROUP BY c.customer_id, c.customer_name
+)
+SELECT CTE.customer_id, CTE.customer_name, MAX(CTE.amnt) AS highest_order_amount
+FROM CTE
+UNION ALL
+SELECT CTE.customer_id, CTE.customer_name, MIN(CTE.amnt) AS lowest_order_amount
+FROM CTE;
+
+
+--6. Get the maximum and minimum ages for each department.
+--Dataset: Employees(employee_id, employee_name, age, department)
+
+select department, max(age), min(age) from Employees
+group by department
+
+--7. Calculate the total sales amount and the number of orders for each month.
+--Dataset: Orders(order_id, order_date, order_amount)
+
+select month(order_date) as mnth, sum(order_amount), count(order_id)
+from Orders
+group by month(order_date)
+order by month(order_date);
+
+--8.Find the average price and the number of products for each supplier_id
+--Dataset: Products(product_id, product_name, price, supplier_id)
+--         Supplier(supplier_id, supplier_name)
+
+
+select s.supplier_id, s.supplier_name, avg(p.price), count(p.product_id)
+    from Suppliers s
+    left join Products p
+        on s.supplier_id = p.supplier_id
+    group by s.supplier_id, s.supplier_name
+
+--9.Get the maximum and minimum prices for each product category
+--Dataset: Products(product_id, product_name, category_id, price)
+--         Categories(category_id, category_name)
+
+select c.category_id, c.category_name, max(p.price), min(p.price)
+from Categories c
+left join Products p
+    on p.category_id = c.category_id
+group by c.category_id, c.category_name
+
+
+--10. Calculate the average rating and the number of reviews for each product category
+--Dataset: Products(product_id, product_name, category_id)
+--         Reviews(product_id, rating)
+
+
+select p.category_id, avg(r.rating), count(r.rating)
+from Products p
+left join Reviews r
+    on p.product_id = r.product_id
+group by p.category_id;
+
+WITH CategoryAvgRating AS (
+    SELECT
+        p.category_id,
+        AVG(r.rating) AS avg_rating,
+        COUNT(r.product_id) AS review_count
+    FROM
+        Products p
+    LEFT JOIN
+        Reviews r ON p.product_id = r.product_id
+    GROUP BY
+        p.category_id
+)
+SELECT
+    c.category_id,
+    c.category_name,
+    COALESCE(car.avg_rating, 0) AS avg_rating,
+    COALESCE(car.review_count, 0) AS review_count
+FROM
+    Categories c
+LEFT JOIN
+    CategoryAvgRating car ON c.category_id = car.category_id;
