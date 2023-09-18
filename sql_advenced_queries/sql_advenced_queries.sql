@@ -502,3 +502,28 @@ select distinct product_id, product_name, avg_rate,
         rank() over (partition by avg_rate) as rt
         from CTE
         order by rt;
+
+--3. Retrieve the top 5 products based on the cumulative sales amount using a window function
+--Dataset: Products(product_id, product_name)
+--         Order_items(order_id, product_id, quantity, amount)
+
+WITH CumulativeSales AS (
+    SELECT
+        p.product_id,
+        p.product_name,
+        SUM(oi.amount) OVER (PARTITION BY oi.product_id ORDER BY oi.amount DESC) AS cumulative_sales
+    FROM
+        Products p
+    JOIN
+        Order_items oi ON p.product_id = oi.product_id
+)
+
+SELECT
+    product_id,
+    product_name,
+    cumulative_sales
+FROM
+    CumulativeSales
+ORDER BY
+    cumulative_sales DESC
+LIMIT 5;
