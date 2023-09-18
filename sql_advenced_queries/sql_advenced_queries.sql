@@ -464,3 +464,41 @@ FROM
     Categories c
 LEFT JOIN
     CategoryAvgRating car ON c.category_id = car.category_id;
+
+
+--1. Retrieve the top 3 customers based on their total amounts, and calculate the percentage of each customer's order
+--amount and calculate the percentage of each customer's order amount compared to the total
+--Dataset: Customers(customer_id, customer_name)
+--         Orders(order_id, customer_id, order_amount)
+
+with CTE as
+(
+select c.customer_id,
+        c.customer_name,
+        sum(o.order_amount) as customer_sum
+from Customers c
+join Orders o
+on c.customer_id = o.customer_id
+group by c.customer_id, c.customer_name
+)
+select customer_name, customer_sum, customer_sum / (sum(customer_sum) over () / 100) as prctg
+from CTE
+order by customer_sum DESC
+limit 3;
+
+
+--2. Calculate the average rating for each product and assign a rank based on the rating using a window function
+--Dataset: Products(product_id, product_name)
+--         Rating(product_id, rating)
+
+with CTE as
+(
+select p.product_id, p.product_name, avg(r.rating) over (partition by p.product_id) as avg_rate
+from Products p
+LEFT JOIN Rating r
+on p.product_id = r.product_id
+)
+select distinct product_id, product_name, avg_rate,
+        rank() over (partition by avg_rate) as rt
+        from CTE
+        order by rt;
