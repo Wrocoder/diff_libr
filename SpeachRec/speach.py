@@ -1,5 +1,6 @@
 import speech_recognition as sr
 
+
 def recognize_speech_from_microphone():
     recognizer = sr.Recognizer()
 
@@ -14,6 +15,7 @@ def recognize_speech_from_microphone():
         print("Речь не распознана")
     except sr.RequestError as e:
         print("Произошла ошибка в запросе к сервису распознавания: {0}".format(e))
+
 
 if __name__ == "__main__":
     recognize_speech_from_microphone()
